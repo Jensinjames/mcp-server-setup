@@ -1,0 +1,74 @@
+# MCP-Server Environment Configuration
+# Copy this file to .env and modify as needed
+
+# ===== Database Configuration =====
+# Database type: 'memory' (for development) or 'mongodb' (for production)
+DB_TYPE=mongodb
+# MongoDB connection URL
+DB_URL=mongodb://localhost:27017
+# Database name
+DB_NAME=mcp
+# Connection pool size (optional)
+DB_POOL_SIZE=10
+# Database connection timeout in milliseconds (optional)
+DB_TIMEOUT=5000
+
+# ===== Authentication =====
+# Secret key for JWT token generation (CHANGE THIS IN PRODUCTION!)
+JWT_SECRET=change-this-to-a-secure-random-string-in-production
+# JWT token expiration time
+JWT_EXPIRY=24h
+# Initial admin password (only used during setup)
+ADMIN_PASSWORD=admin123
+# Initial user password (only used during setup)
+USER_PASSWORD=user123
+# Enable/disable authentication (set to false for development only)
+AUTH_ENABLED=true
+
+# ===== Server Configuration =====
+# Server port
+PORT=3000
+# Server host
+HOST=localhost
+# Node environment: 'development', 'test', or 'production'
+NODE_ENV=development
+# Enable CORS for specified origins (comma-separated list or '*' for all)
+CORS_ORIGINS=*
+# Maximum request body size in bytes
+MAX_BODY_SIZE=1048576
+
+# ===== Logging =====
+# Log level: 'error', 'warn', 'info', 'debug', 'trace'
+LOG_LEVEL=info
+# Enable request logging
+REQUEST_LOGGING=true
+# Log format: 'json' or 'text'
+LOG_FORMAT=text
+# Log to file (in addition to console)
+LOG_TO_FILE=false
+# Log file path (if LOG_TO_FILE is true)
+LOG_FILE_PATH=logs/mcp-server.log
+
+# ===== Model Configuration =====
+# Default model provider (optional)
+DEFAULT_PROVIDER=OpenAI
+# Maximum number of models to return in list operations
+MAX_MODELS_PER_PAGE=100
+# Enable model versioning
+ENABLE_MODEL_VERSIONING=true
+
+# ===== Admin Client Configuration =====
+# Admin client timeout in milliseconds
+ADMIN_CLIENT_TIMEOUT=30000
+# Enable admin client debug mode
+ADMIN_CLIENT_DEBUG=false
+# Admin session duration in hours
+ADMIN_SESSION_DURATION=8
+
+# ===== Security =====
+# Rate limiting: max requests per minute per IP
+RATE_LIMIT=100
+# Enable request IP validation
+IP_VALIDATION=false
+# Allowed IP addresses/ranges (comma-separated, if IP_VALIDATION is true)
+ALLOWED_IPS=127.0.0.1,::1

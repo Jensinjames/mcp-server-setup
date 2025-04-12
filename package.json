@@ -1,0 +1,62 @@
+{
+  "name": "mcp-server-setup",
+  "version": "1.0.0",
+  "description": "Model Context Protocol (MCP) Server Implementation",
+  "main": "mcp-server.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node mcp-server.ts",
+    "dev": "ts-node-dev --respawn --transpile-only mcp-server.ts",
+    "admin": "ts-node mcp-admin.ts",
+    "admin:web": "ts-node mcp-admin-web.ts",
+    "admin:web:build": "./build-admin.sh",
+    "admin:web:start": "node dist/mcp-admin-web.js",
+    "admin:simple": "node mcp-admin-simple.js",
+    "admin:basic": "node admin-basic.js",
+    "admin:static": "node simple-admin.js",
+    "setup": "ts-node src/scripts/db-setup.ts"
+  },
+  "keywords": [
+    "MCP",
+    "AI",
+    "TypeScript",
+    "Server"
+  ],
+  "author": "Jensin Roussell",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.1.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.13",
+    "@types/ejs": "^3.1.2",
+    "@types/express": "^4.17.17",
+    "@types/express-session": "^1.17.7",
+    "@types/jest": "^29.5.14",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/node": "^20.0.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.3.1",
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jensinjames/mcp-server-setup.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Jensinjames/mcp-server-setup/issues"
+  },
+  "homepage": "https://github.com/Jensinjames/mcp-server-setup#readme"
+}

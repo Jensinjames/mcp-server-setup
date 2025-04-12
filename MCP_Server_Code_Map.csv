@@ -1,0 +1,52 @@
+File,Function or Declaration
+auth-middleware.ts,"server.use(async (req, next) => {"
+auth-middleware.ts,server.validateAuth = (requiredRole: string) => {
+auth-middleware.ts,"return async (req: any, next: () => Promise<any>) => {"
+auth-middleware.ts,validateAuth: (requiredRole: string) => any;
+mcp-server.ts,async (uri) => ({
+mcp-server.ts,"async (uri, { modelId }) => {"
+mcp-server.ts,const model = db.models.find(m => m.id === modelId);
+mcp-server.ts,async (uri) => ({
+mcp-server.ts,"async ({ name, provider, parameters }) => {"
+mcp-server.ts,async ({ modelId }) => {
+mcp-server.ts,db.models = db.models.filter(m => m.id !== modelId);
+mcp-server.ts,"async ({ modelId, name, provider, parameters }) => {"
+mcp-server.ts,const model = db.models.find(m => m.id === modelId);
+mcp-server.ts,async ({ provider }) => {
+mcp-server.ts,filteredModels = filteredModels.filter(m => m.provider === provider);
+mcp-server.ts,"totalParameters: filteredModels.reduce((sum, model) => sum + model.parameters, 0),"
+mcp-server.ts,providers: [...new Set(filteredModels.map(m => m.provider))]
+mcp-server.ts,({ focus }) => ({
+mcp-server.ts,({ modelIds }) => ({
+mcp-server.ts,({ goal }) => ({
+mcp-server.ts,const startServer = async () => {
+mcp-server.ts,startServer().catch(err => {
+mcp-admin.ts,class ModelAdminClient {
+mcp-admin.ts,"resources.resources.forEach((resource, index) => {"
+mcp-admin.ts,"tools.tools.forEach((tool, index) => {"
+mcp-admin.ts,tool.arguments.forEach(arg => {
+mcp-admin.ts,"prompts.prompts.forEach((prompt, index) => {"
+mcp-admin.ts,prompt.arguments.forEach(arg => {
+mcp-admin.ts,models.forEach(model => console.log(`- ${model.id}: ${model.name}`));
+mcp-admin.ts,"const ids = modelIds.split(',').map(id => id.trim());"
+mcp-admin.ts,return new Promise((resolve) => {
+mcp-admin.ts,"this.rl.question(question, (answer) => {"
+model-version.ts,return versions.find(v => v.versionNumber === versionNumber) || null;
+model-version.ts,const versionIndex = versions.findIndex(v => v.versionNumber === versionNumber);
+model-version.ts,const versionIndex = versions.findIndex(v => v.versionNumber === versionNumber);
+model-version.ts,const updatedTags = (version.tags || []).filter(t => t !== tag);
+mcp-client.ts,class ModelClient {
+memory-adapter.ts,const model = this.models.find(m => m.id === id);
+memory-adapter.ts,const index = this.models.findIndex(m => m.id === id);
+memory-adapter.ts,this.models = this.models.filter(m => m.id !== id);
+memory-adapter.ts,"return this.users.map(({ password, ...user }) => ({ ...user, password: '***' } as UserData));"
+memory-adapter.ts,const user = this.users.find(u => u.id === id);
+memory-adapter.ts,const user = this.users.find(u => u.username === username);
+memory-adapter.ts,const index = this.users.findIndex(u => u.id === id);
+memory-adapter.ts,this.users = this.users.filter(u => u.id !== id);
+enhanced-model.ts,"createdAt: z.date().default(() => new Date()),"
+rate-limiter.ts,"setInterval(() => this.cleanup(), this.config.windowMs);"
+rate-limiter.ts,"return async (req: any, next: () => Promise<any>) => {"
+auth-service.ts,const user = users.find(u => u.username === username);
+auth-service.ts,return users.find(u => u.id === id);
+auth-service.ts,"return users.map(({ password, ...user }) => user);"

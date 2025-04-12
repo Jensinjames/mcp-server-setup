@@ -1,0 +1,136 @@
+/* Main Styles for MCP Admin Console */
+
+/* Global Styles */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+}
+
+main {
+  flex: 1;
+}
+
+/* Card Styles */
+.card {
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.card-header {
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  font-weight: 500;
+}
+
+/* Dashboard Stats */
+.icon-box {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+/* Table Styles */
+.table th {
+  font-weight: 600;
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* Form Styles */
+.form-label {
+  font-weight: 500;
+}
+
+/* Code Block Styles */
+pre {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 0.25rem;
+  padding: 1rem;
+  font-size: 0.875rem;
+}
+
+code {
+  color: #e83e8c;
+}
+
+/* Navbar Styles */
+.navbar-brand {
+  font-weight: 600;
+}
+
+/* Footer Styles */
+footer {
+  margin-top: auto;
+  border-top: 1px solid #dee2e6;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .card-body {
+    padding: 1rem;
+  }
+  
+  .icon-box {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+}
+
+/* Animation for refresh button */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.fa-sync-alt.spinning {
+  animation: spin 1s linear infinite;
+}
+
+/* Badge Styles */
+.badge {
+  font-weight: 500;
+  padding: 0.35em 0.65em;
+}
+
+/* Progress Bar Styles */
+.progress {
+  border-radius: 0.5rem;
+  background-color: #e9ecef;
+}
+
+.progress-bar {
+  border-radius: 0.5rem;
+}
+
+.progress-tall {
+  height: 25px;
+}
+
+/* Modal Styles */
+.modal-header {
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+
+/* Login Page Styles */
+.login-container {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* Chart Styles */
+canvas {
+  max-width: 100%;
+}

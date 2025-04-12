@@ -1,0 +1,355 @@
+<%- include('layout', { 
+  user,
+  body: `
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+          <h1 class="mb-0">
+            <i class="fas fa-users me-2"></i>Users
+          </h1>
+          <div>
+            <a href="/dashboard" class="btn btn-secondary me-2">
+              <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+            </a>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addUserModal">
+              <i class="fas fa-user-plus me-2"></i>Add User
+            </button>
+          </div>
+        </div>
+        <hr>
+      </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="row mb-4">
+      <div class="col-md-8">
+        <div class="input-group">
+          <span class="input-group-text">
+            <i class="fas fa-search"></i>
+          </span>
+          <input type="text" id="userSearch" class="form-control" placeholder="Search users...">
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="input-group">
+          <span class="input-group-text">
+            <i class="fas fa-filter"></i>
+          </span>
+          <select id="roleFilter" class="form-select">
+            <option value="">All Roles</option>
+            ${[...new Set(users.map(user => user.role))].map(role => 
+              `<option value="${role}">${role}</option>`
+            ).join('')}
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="card shadow">
+      <div class="card-header bg-success text-white">
+        <h5 class="mb-0">
+          <i class="fas fa-list me-2"></i>Users List
+        </h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0" id="usersTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Created</th>
+                <th>Updated</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${users.map(u => `
+                <tr data-role="${u.role}">
+                  <td>${u.id}</td>
+                  <td>${u.username}</td>
+                  <td><span class="badge bg-${u.role === 'admin' ? 'danger' : 'primary'}">${u.role}</span></td>
+                  <td>${u.createdAt ? new Date(u.createdAt).toLocaleString() : 'N/A'}</td>
+                  <td>${u.updatedAt ? new Date(u.updatedAt).toLocaleString() : 'N/A'}</td>
+                  <td>
+                    <button type="button" class="btn btn-sm btn-warning me-1" title="Edit" 
+                            data-bs-toggle="modal" data-bs-target="#editUserModal" 
+                            data-user-id="${u.id}" 
+                            data-username="${u.username}" 
+                            data-role="${u.role}">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger" title="Delete" 
+                            data-bs-toggle="modal" data-bs-target="#deleteUserModal" 
+                            data-user-id="${u.id}" 
+                            data-username="${u.username}">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="d-flex justify-content-between align-items-center">
+          <span>Total Users: <span id="userCount">${users.length}</span></span>
+          <button id="exportUsers" class="btn btn-sm btn-secondary">
+            <i class="fas fa-download me-2"></i>Export to CSV
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-success text-white">
+            <h5 class="modal-title">
+              <i class="fas fa-user-plus me-2"></i>Add New User
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form action="/api/users" method="POST" id="addUserForm">
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="username" class="form-label">Username <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="username" name="username" required>
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" id="password" name="password" required>
+              </div>
+              <div class="mb-3">
+                <label for="confirmPassword" class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+              </div>
+              <div class="mb-3">
+                <label for="role" class="form-label">Role <span class="text-danger">*</span></label>
+                <select class="form-select" id="role" name="role" required>
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-success">
+                <i class="fas fa-user-plus me-2"></i>Add User
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-warning">
+            <h5 class="modal-title">
+              <i class="fas fa-user-edit me-2"></i>Edit User
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form id="editUserForm">
+            <div class="modal-body">
+              <input type="hidden" id="editUserId" name="id">
+              <div class="mb-3">
+                <label for="editUsername" class="form-label">Username <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="editUsername" name="username" required>
+              </div>
+              <div class="mb-3">
+                <label for="editPassword" class="form-label">New Password (leave blank to keep current)</label>
+                <input type="password" class="form-control" id="editPassword" name="password">
+              </div>
+              <div class="mb-3">
+                <label for="editRole" class="form-label">Role <span class="text-danger">*</span></label>
+                <select class="form-select" id="editRole" name="role" required>
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-warning">
+                <i class="fas fa-save me-2"></i>Update User
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete User Modal -->
+    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title">
+              <i class="fas fa-exclamation-triangle me-2"></i>Delete User
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to delete the user <strong id="deleteUsername"></strong>?</p>
+            <p class="text-danger">This action cannot be undone.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger" id="confirmDeleteUser">
+              <i class="fas fa-trash me-2"></i>Delete User
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+  extraScripts: `
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const userSearch = document.getElementById('userSearch');
+        const roleFilter = document.getElementById('roleFilter');
+        const usersTable = document.getElementById('usersTable');
+        const userCount = document.getElementById('userCount');
+        const exportUsers = document.getElementById('exportUsers');
+        
+        // Add User Form Validation
+        const addUserForm = document.getElementById('addUserForm');
+        addUserForm.addEventListener('submit', function(event) {
+          event.preventDefault();
+          
+          const password = document.getElementById('password').value;
+          const confirmPassword = document.getElementById('confirmPassword').value;
+          
+          if (password !== confirmPassword) {
+            alert('Passwords do not match');
+            return;
+          }
+          
+          // In a real application, you would submit the form via AJAX
+          // For this example, we'll just show a success message
+          alert('User added successfully!');
+          
+          // Reset form and close modal
+          addUserForm.reset();
+          const modal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
+          modal.hide();
+        });
+        
+        // Edit User Modal
+        const editUserModal = document.getElementById('editUserModal');
+        editUserModal.addEventListener('show.bs.modal', function(event) {
+          const button = event.relatedTarget;
+          const userId = button.getAttribute('data-user-id');
+          const username = button.getAttribute('data-username');
+          const role = button.getAttribute('data-role');
+          
+          document.getElementById('editUserId').value = userId;
+          document.getElementById('editUsername').value = username;
+          document.getElementById('editRole').value = role;
+        });
+        
+        // Edit User Form Submission
+        const editUserForm = document.getElementById('editUserForm');
+        editUserForm.addEventListener('submit', function(event) {
+          event.preventDefault();
+          
+          // In a real application, you would submit the form via AJAX
+          // For this example, we'll just show a success message
+          alert('User updated successfully!');
+          
+          // Reset form and close modal
+          editUserForm.reset();
+          const modal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
+          modal.hide();
+        });
+        
+        // Delete User Modal
+        const deleteUserModal = document.getElementById('deleteUserModal');
+        deleteUserModal.addEventListener('show.bs.modal', function(event) {
+          const button = event.relatedTarget;
+          const userId = button.getAttribute('data-user-id');
+          const username = button.getAttribute('data-username');
+          
+          document.getElementById('deleteUsername').textContent = username;
+          
+          // Set up the confirm delete button
+          const confirmDeleteButton = document.getElementById('confirmDeleteUser');
+          confirmDeleteButton.onclick = function() {
+            // In a real application, you would send a DELETE request via AJAX
+            // For this example, we'll just show a success message
+            alert('User deleted successfully!');
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteUserModal'));
+            modal.hide();
+          };
+        });
+        
+        // Search and filter functionality
+        function filterUsers() {
+          const searchTerm = userSearch.value.toLowerCase();
+          const roleValue = roleFilter.value;
+          let visibleCount = 0;
+          
+          Array.from(usersTable.querySelectorAll('tbody tr')).forEach(row => {
+            const username = row.cells[1].textContent.toLowerCase();
+            const userRole = row.getAttribute('data-role');
+            const matchesSearch = username.includes(searchTerm);
+            const matchesRole = roleValue === '' || userRole === roleValue;
+            
+            if (matchesSearch && matchesRole) {
+              row.style.display = '';
+              visibleCount++;
+            } else {
+              row.style.display = 'none';
+            }
+          });
+          
+          userCount.textContent = visibleCount;
+        }
+        
+        userSearch.addEventListener('input', filterUsers);
+        roleFilter.addEventListener('change', filterUsers);
+        
+        // Export to CSV functionality
+        exportUsers.addEventListener('click', function() {
+          // Get visible rows
+          const visibleRows = Array.from(usersTable.querySelectorAll('tbody tr'))
+            .filter(row => row.style.display !== 'none');
+          
+          // Create CSV content
+          let csvContent = 'ID,Username,Role,Created,Updated\\n';
+          
+          visibleRows.forEach(row => {
+            const id = row.cells[0].textContent;
+            const username = row.cells[1].textContent;
+            const role = row.cells[2].textContent.trim();
+            const created = row.cells[3].textContent;
+            const updated = row.cells[4].textContent;
+            
+            csvContent += \`"\${id}","\${username}","\${role}","\${created}","\${updated}"\\n\`;
+          });
+          
+          // Create download link
+          const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.setAttribute('href', url);
+          link.setAttribute('download', 'users.csv');
+          link.style.visibility = 'hidden';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        });
+      });
+    </script>
+  `
+}) %>

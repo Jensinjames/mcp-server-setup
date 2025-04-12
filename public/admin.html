@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCP Admin Console</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+    }
+    .card {
+      margin-bottom: 20px;
+      border-radius: 0.5rem;
+      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    .card-header {
+      border-top-left-radius: 0.5rem;
+      border-top-right-radius: 0.5rem;
+      font-weight: 500;
+    }
+    .icon-box {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    .navbar {
+      margin-bottom: 20px;
+      border-radius: 0.5rem;
+    }
+    .progress {
+      height: 25px;
+    }
+    .memory-progress-width {
+      width: 25%;
+    }
+    .cpu-progress-width {
+      width: 25%;
+    }
+
+    /* Spinning animation for refresh icon */
+    .fa-spin {
+      animation: fa-spin 2s infinite linear;
+      will-change: transform;
+    }
+    @keyframes fa-spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Chart container styles */
+    .chart-container {
+      height: 300px;
+      position: relative;
+    }
+    .chart-wrapper {
+      position: relative;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <i class="fas fa-brain me-2"></i>MCP Admin
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" title="Toggle navigation menu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="#">
+              <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <i class="fas fa-cube me-1"></i>Models
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <i class="fas fa-users me-1"></i>Users
+            </a>
+          </li>
+        </ul>
+        <div class="navbar-text me-3">
+          <i class="fas fa-user me-1"></i>admin (admin)
+        </div>
+        <a href="#" class="btn btn-outline-light">
+          <i class="fas fa-sign-out-alt me-1"></i>Logout
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+          <h1 class="mb-0">
+            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+          </h1>
+          <button id="refreshDashboard" type="button" class="btn btn-primary">
+            <i class="fas fa-sync-alt me-2"></i>Refresh Data
+          </button>
+        </div>
+        <hr>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+      <!-- Models Stats -->
+      <div class="col-md-4">
+        <div class="card shadow h-100">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-cube me-2"></i>Models
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-6 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="icon-box bg-primary text-white me-3">
+                    <i class="fas fa-cubes"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Total</h6>
+                    <h4 class="mb-0" id="totalModels">3</h4>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="icon-box bg-success text-white me-3">
+                    <i class="fas fa-plus"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">New (30d)</h6>
+                    <h4 class="mb-0" id="newModels">3</h4>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="d-flex align-items-center">
+                  <div class="icon-box bg-info text-white me-3">
+                    <i class="fas fa-microchip"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Parameters</h6>
+                    <h4 class="mb-0" id="totalParameters">445B</h4>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="d-flex align-items-center">
+                  <div class="icon-box bg-warning text-white me-3">
+                    <i class="fas fa-edit"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Updated (7d)</h6>
+                    <h4 class="mb-0" id="updatedModels">1</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a href="#" class="btn btn-sm btn-primary w-100">
+              <i class="fas fa-list me-2"></i>View All Models
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users Stats -->
+      <div class="col-md-4">
+        <div class="card shadow h-100">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-users me-2"></i>Users
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-6 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="icon-box bg-success text-white me-3">
+                    <i class="fas fa-users"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Total</h6>
+                    <h4 class="mb-0" id="totalUsers">2</h4>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="icon-box bg-primary text-white me-3">
+                    <i class="fas fa-user-shield"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Admins</h6>
+                    <h4 class="mb-0" id="adminUsers">1</h4>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="d-flex align-items-center">
+                  <div class="icon-box bg-info text-white me-3">
+                    <i class="fas fa-user-check"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Active</h6>
+                    <h4 class="mb-0" id="activeUsers">2</h4>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="d-flex align-items-center">
+                  <div class="icon-box bg-warning text-white me-3">
+                    <i class="fas fa-user-plus"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">New (30d)</h6>
+                    <h4 class="mb-0" id="newUsers">2</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a href="#" class="btn btn-sm btn-success w-100">
+              <i class="fas fa-list me-2"></i>View All Users
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Stats -->
+      <div class="col-md-4">
+        <div class="card shadow h-100">
+          <div class="card-header bg-info text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-server me-2"></i>System
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <h6>CPU Usage</h6>
+              <div class="progress">
+                <div id="cpuUsage" class="progress-bar progress-bar-striped progress-bar-animated progress-tall"
+                     role="progressbar" title="CPU Usage Progress Bar" aria-label="CPU Usage Progress Bar"
+                     style="width: 25%;">
+                  25%
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <h6>Memory Usage</h6>
+              <div class="progress">
+                <div id="memoryUsage" class="progress-bar progress-bar-striped progress-bar-animated bg-success memory-progress-width"
+                     role="progressbar" title="Memory Usage: 25%">
+                  25%
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-6">
+                <div class="d-flex align-items-center">
+                  <div class="icon-box bg-warning text-white me-3">
+                    <i class="fas fa-clock"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Uptime</h6>
+                    <h4 class="mb-0" id="uptime">1h</h4>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="d-flex align-items-center">
+                  <div class="icon-box bg-danger text-white me-3">
+                    <i class="fas fa-database"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">DB Size</h6>
+                    <h4 class="mb-0" id="dbSize">50 MB</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="text-muted">
+              <i class="fas fa-history me-1"></i>Last Backup:
+              <span id="lastBackup">Yesterday</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+      <!-- Models by Provider Chart -->
+      <div class="col-md-6">
+        <div class="card shadow h-100">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-chart-pie me-2"></i>Models by Provider
+            </h5>
+          </div>
+          <div class="card-body chart-container">
+            <div class="chart-wrapper">
+              <canvas id="modelsByProviderChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users by Role Chart -->
+      <div class="col-md-6">
+        <div class="card shadow h-100">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-chart-pie me-2"></i>Users by Role
+            </h5>
+          </div>
+          <div class="card-body chart-container">
+            <div class="chart-wrapper">
+              <canvas id="usersByRoleChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+      <!-- Recent Models -->
+      <div class="col-md-6">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-history me-2"></i>Recent Models
+            </h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Provider</th>
+                    <th>Parameters</th>
+                    <th>Created</th>
+                  </tr>
+                </thead>
+                <tbody id="recentModelsTable">
+                  <tr>
+                    <td>GPT-4</td>
+                    <td>OpenAI</td>
+                    <td>175B</td>
+                    <td>7 days ago</td>
+                  </tr>
+                  <tr>
+                    <td>Claude 3 Opus</td>
+                    <td>Anthropic</td>
+                    <td>200B</td>
+                    <td>5 days ago</td>
+                  </tr>
+                  <tr>
+                    <td>Llama 3 70B</td>
+                    <td>Meta</td>
+                    <td>70B</td>
+                    <td>3 days ago</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a href="#" class="btn btn-sm btn-primary w-100">
+              <i class="fas fa-list me-2"></i>View All Models
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Users -->
+      <div class="col-md-6">
+        <div class="card shadow">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-history me-2"></i>Recent Users
+            </h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Created</th>
+                  </tr>
+                </thead>
+                <tbody id="recentUsersTable">
+                  <tr>
+                    <td>admin</td>
+                    <td><span class="badge bg-danger">admin</span></td>
+                    <td>10 days ago</td>
+                  </tr>
+                  <tr>
+                    <td>user</td>
+                    <td><span class="badge bg-primary">user</span></td>
+                    <td>5 days ago</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a href="#" class="btn btn-sm btn-success w-100">
+              <i class="fas fa-list me-2"></i>View All Users
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-info mt-4">
+      <strong>Note:</strong> This is a static HTML version of the MCP Admin Console. For the full version with dynamic data, please fix the TypeScript errors in the main admin console.
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

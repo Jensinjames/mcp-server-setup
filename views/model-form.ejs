@@ -1,0 +1,104 @@
+<%- include('layout', { 
+  user,
+  body: `
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+          <h1 class="mb-0">
+            <i class="fas fa-${action === 'add' ? 'plus' : 'edit'} me-2"></i>${action === 'add' ? 'Add New' : 'Edit'} Model
+          </h1>
+          <div>
+            <a href="/models" class="btn btn-secondary">
+              <i class="fas fa-arrow-left me-2"></i>Back to Models
+            </a>
+          </div>
+        </div>
+        <hr>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-8 mx-auto">
+        <div class="card shadow">
+          <div class="card-header bg-${action === 'add' ? 'success' : 'warning'} text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-${action === 'add' ? 'plus' : 'edit'} me-2"></i>${action === 'add' ? 'Add New' : 'Edit'} Model
+            </h5>
+          </div>
+          <div class="card-body">
+            <form action="${action === 'add' ? '/models/add' : '/models/' + model.id + '/edit'}" method="POST" id="modelForm">
+              <div class="mb-3">
+                <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="name" name="name" value="${model ? model.name : ''}" required>
+                <div class="form-text">Enter the model name (e.g., "GPT-4", "Claude 3 Opus")</div>
+              </div>
+              
+              <div class="mb-3">
+                <label for="provider" class="form-label">Provider <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="provider" name="provider" value="${model ? model.provider : ''}" required>
+                <div class="form-text">Enter the model provider (e.g., "OpenAI", "Anthropic")</div>
+              </div>
+              
+              <div class="mb-3">
+                <label for="parameters" class="form-label">Parameters <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <input type="number" class="form-control" id="parameters" name="parameters" value="${model ? model.parameters : ''}" required>
+                  <span class="input-group-text">parameters</span>
+                </div>
+                <div class="form-text">Enter the number of parameters (e.g., 175000000000 for 175B)</div>
+              </div>
+              
+              <div class="mb-3">
+                <label for="metadata" class="form-label">Metadata (JSON)</label>
+                <textarea class="form-control" id="metadata" name="metadata" rows="5">${model && model.metadata ? JSON.stringify(model.metadata, null, 2) : ''}</textarea>
+                <div class="form-text">Optional: Enter metadata as JSON (e.g., {"contextWindow": 100000, "releaseDate": "2023-03-15"})</div>
+              </div>
+              
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-${action === 'add' ? 'success' : 'warning'}">
+                  <i class="fas fa-${action === 'add' ? 'plus' : 'save'} me-2"></i>${action === 'add' ? 'Add' : 'Update'} Model
+                </button>
+                <a href="/models" class="btn btn-secondary">
+                  <i class="fas fa-times me-2"></i>Cancel
+                </a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+  extraScripts: `
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('modelForm');
+        const metadataField = document.getElementById('metadata');
+        
+        form.addEventListener('submit', function(event) {
+          // Validate parameters field
+          const parametersField = document.getElementById('parameters');
+          const parameters = parseInt(parametersField.value);
+          
+          if (isNaN(parameters) || parameters <= 0) {
+            event.preventDefault();
+            alert('Parameters must be a positive number');
+            parametersField.focus();
+            return;
+          }
+          
+          // Validate metadata JSON if provided
+          if (metadataField.value.trim() !== '') {
+            try {
+              JSON.parse(metadataField.value);
+            } catch (error) {
+              event.preventDefault();
+              alert('Metadata must be valid JSON: ' + error.message);
+              metadataField.focus();
+              return;
+            }
+          }
+        });
+      });
+    </script>
+  `
+}) %>

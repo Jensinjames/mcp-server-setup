@@ -1,0 +1,126 @@
+<%- include('layout', { 
+  user,
+  body: `
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+          <h1 class="mb-0">
+            <i class="fas fa-cube me-2"></i>Model Details
+          </h1>
+          <div>
+            <a href="/models" class="btn btn-secondary me-2">
+              <i class="fas fa-list me-2"></i>All Models
+            </a>
+            <% if (user.role === 'admin') { %>
+              <a href="/models/${model.id}/edit" class="btn btn-warning me-2">
+                <i class="fas fa-edit me-2"></i>Edit
+              </a>
+              <a href="/models/${model.id}/delete" class="btn btn-danger">
+                <i class="fas fa-trash me-2"></i>Delete
+              </a>
+            <% } %>
+          </div>
+        </div>
+        <hr>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <!-- Basic Info Card -->
+        <div class="card shadow mb-4">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-info-circle me-2"></i>Basic Information
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label fw-bold">ID</label>
+              <p class="form-control-static">${model.id}</p>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Name</label>
+              <p class="form-control-static">${model.name}</p>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Provider</label>
+              <p class="form-control-static">
+                <span class="badge bg-primary">${model.provider}</span>
+              </p>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Parameters</label>
+              <p class="form-control-static">${(model.parameters / 1e9).toFixed(1)} billion</p>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Version</label>
+              <p class="form-control-static">${model.version || 'N/A'}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <!-- Timestamps Card -->
+        <div class="card shadow mb-4">
+          <div class="card-header bg-info text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-clock me-2"></i>Timestamps
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label fw-bold">Created At</label>
+              <p class="form-control-static">
+                ${model.createdAt ? new Date(model.createdAt).toLocaleString() : 'N/A'}
+              </p>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Updated At</label>
+              <p class="form-control-static">
+                ${model.updatedAt ? new Date(model.updatedAt).toLocaleString() : 'N/A'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metadata Card -->
+        <div class="card shadow">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-tags me-2"></i>Metadata
+            </h5>
+          </div>
+          <div class="card-body">
+            ${model.metadata ? 
+              Object.entries(model.metadata).map(([key, value]) => `
+                <div class="mb-3">
+                  <label class="form-label fw-bold">${key}</label>
+                  <p class="form-control-static">${value}</p>
+                </div>
+              `).join('') : 
+              '<p class="text-muted">No metadata available</p>'
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JSON Representation -->
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card shadow">
+          <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-code me-2"></i>JSON Representation
+            </h5>
+          </div>
+          <div class="card-body">
+            <pre class="mb-0"><code>${JSON.stringify(model, null, 2)}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  `
+}) %>

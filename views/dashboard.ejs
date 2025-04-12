@@ -1,0 +1,457 @@
+<%- include('layout', { 
+  user,
+  body: `
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+          <h1 class="mb-0">
+            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+          </h1>
+          <button id="refreshDashboard" class="btn btn-primary">
+            <i class="fas fa-sync-alt me-2"></i>Refresh Data
+          </button>
+        </div>
+        <hr>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+      <!-- Models Stats -->
+      <div class="col-md-4">
+        <div class="card shadow h-100">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-cube me-2"></i>Models
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-6 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="icon-box bg-primary text-white me-3">
+                    <i class="fas fa-cubes"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Total</h6>
+                    <h4 class="mb-0" id="totalModels">${data.modelStats.totalModels}</h4>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="icon-box bg-success text-white me-3">
+                    <i class="fas fa-plus"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">New (30d)</h6>
+                    <h4 class="mb-0" id="newModels">${data.modelStats.modelsCreatedLast30Days}</h4>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="d-flex align-items-center">
+                  <div class="icon-box bg-info text-white me-3">
+                    <i class="fas fa-microchip"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Parameters</h6>
+                    <h4 class="mb-0" id="totalParameters">${(data.modelStats.totalParameters / 1e9).toFixed(1)}B</h4>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="d-flex align-items-center">
+                  <div class="icon-box bg-warning text-white me-3">
+                    <i class="fas fa-edit"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Updated (7d)</h6>
+                    <h4 class="mb-0" id="updatedModels">${data.modelStats.modelsUpdatedLast7Days}</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a href="/models" class="btn btn-sm btn-primary w-100">
+              <i class="fas fa-list me-2"></i>View All Models
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users Stats -->
+      <div class="col-md-4">
+        <div class="card shadow h-100">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-users me-2"></i>Users
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-6 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="icon-box bg-success text-white me-3">
+                    <i class="fas fa-users"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Total</h6>
+                    <h4 class="mb-0" id="totalUsers">${data.userStats.totalUsers}</h4>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6 mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="icon-box bg-primary text-white me-3">
+                    <i class="fas fa-user-shield"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Admins</h6>
+                    <h4 class="mb-0" id="adminUsers">${data.userStats.usersByRole.admin || 0}</h4>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="d-flex align-items-center">
+                  <div class="icon-box bg-info text-white me-3">
+                    <i class="fas fa-user-check"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Active</h6>
+                    <h4 class="mb-0" id="activeUsers">${data.userStats.activeUsers}</h4>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="d-flex align-items-center">
+                  <div class="icon-box bg-warning text-white me-3">
+                    <i class="fas fa-user-plus"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">New (30d)</h6>
+                    <h4 class="mb-0" id="newUsers">${data.userStats.newUsersLast30Days}</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a href="/users" class="btn btn-sm btn-success w-100">
+              <i class="fas fa-list me-2"></i>View All Users
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Stats -->
+      <div class="col-md-4">
+        <div class="card shadow h-100">
+          <div class="card-header bg-info text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-server me-2"></i>System
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label mb-1">CPU Usage</label>
+              <div class="progress" style="height: 25px;">
+                <div id="cpuUsage" class="progress-bar progress-bar-striped progress-bar-animated" 
+                     role="progressbar" style="width: ${data.systemStats.cpuUsage}%;">
+                  ${data.systemStats.cpuUsage}%
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label mb-1">Memory Usage</label>
+              <div class="progress" style="height: 25px;">
+                <div id="memoryUsage" class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+                     role="progressbar" style="width: ${(data.systemStats.memoryUsage.used / data.systemStats.memoryUsage.total) * 100}%;">
+                  ${Math.round((data.systemStats.memoryUsage.used / data.systemStats.memoryUsage.total) * 100)}%
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-6">
+                <div class="d-flex align-items-center">
+                  <div class="icon-box bg-warning text-white me-3">
+                    <i class="fas fa-clock"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Uptime</h6>
+                    <h4 class="mb-0" id="uptime">${Math.floor(data.systemStats.uptime / 3600)}h</h4>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="d-flex align-items-center">
+                  <div class="icon-box bg-danger text-white me-3">
+                    <i class="fas fa-database"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">DB Size</h6>
+                    <h4 class="mb-0" id="dbSize">${Math.round(data.systemStats.databaseSize / (1024 * 1024))} MB</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="text-muted">
+              <i class="fas fa-history me-1"></i>Last Backup: 
+              <span id="lastBackup">${data.systemStats.lastBackupTime ? new Date(data.systemStats.lastBackupTime).toLocaleString() : 'Never'}</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+      <!-- Models by Provider Chart -->
+      <div class="col-md-6">
+        <div class="card shadow h-100">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-chart-pie me-2"></i>Models by Provider
+            </h5>
+          </div>
+          <div class="card-body">
+            <canvas id="modelsByProviderChart" height="250"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users by Role Chart -->
+      <div class="col-md-6">
+        <div class="card shadow h-100">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-chart-pie me-2"></i>Users by Role
+            </h5>
+          </div>
+          <div class="card-body">
+            <canvas id="usersByRoleChart" height="250"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+      <!-- Recent Models -->
+      <div class="col-md-6">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-history me-2"></i>Recent Models
+            </h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Provider</th>
+                    <th>Parameters</th>
+                    <th>Created</th>
+                  </tr>
+                </thead>
+                <tbody id="recentModelsTable">
+                  ${data.recentModels.map(model => `
+                    <tr>
+                      <td>${model.name}</td>
+                      <td>${model.provider}</td>
+                      <td>${(model.parameters / 1e9).toFixed(1)}B</td>
+                      <td>${model.createdAt ? new Date(model.createdAt).toLocaleString() : 'N/A'}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a href="/models" class="btn btn-sm btn-primary w-100">
+              <i class="fas fa-list me-2"></i>View All Models
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Users -->
+      <div class="col-md-6">
+        <div class="card shadow">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-history me-2"></i>Recent Users
+            </h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Created</th>
+                  </tr>
+                </thead>
+                <tbody id="recentUsersTable">
+                  ${data.recentUsers.map(user => `
+                    <tr>
+                      <td>${user.username}</td>
+                      <td><span class="badge bg-${user.role === 'admin' ? 'danger' : 'primary'}">${user.role}</span></td>
+                      <td>${user.createdAt ? new Date(user.createdAt).toLocaleString() : 'N/A'}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a href="/users" class="btn btn-sm btn-success w-100">
+              <i class="fas fa-list me-2"></i>View All Users
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+  extraStyles: `
+    <style>
+      .icon-box {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+      }
+    </style>
+  `,
+  extraScripts: `
+    <script>
+      // Initialize charts when the DOM is loaded
+      document.addEventListener('DOMContentLoaded', function() {
+        // Models by Provider Chart
+        const modelsByProviderCtx = document.getElementById('modelsByProviderChart').getContext('2d');
+        const modelsByProviderData = ${JSON.stringify(data.modelStats.modelsByProvider)};
+        const modelsByProviderChart = new Chart(modelsByProviderCtx, {
+          type: 'pie',
+          data: {
+            labels: Object.keys(modelsByProviderData),
+            datasets: [{
+              data: Object.values(modelsByProviderData),
+              backgroundColor: [
+                '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#5a5c69'
+              ]
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'right'
+              }
+            }
+          }
+        });
+
+        // Users by Role Chart
+        const usersByRoleCtx = document.getElementById('usersByRoleChart').getContext('2d');
+        const usersByRoleData = ${JSON.stringify(data.userStats.usersByRole)};
+        const usersByRoleChart = new Chart(usersByRoleCtx, {
+          type: 'pie',
+          data: {
+            labels: Object.keys(usersByRoleData),
+            datasets: [{
+              data: Object.values(usersByRoleData),
+              backgroundColor: [
+                '#e74a3b', '#1cc88a', '#4e73df', '#f6c23e', '#36b9cc', '#5a5c69'
+              ]
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'right'
+              }
+            }
+          }
+        });
+
+        // Refresh dashboard data
+        document.getElementById('refreshDashboard').addEventListener('click', function() {
+          fetch('/api/dashboard?refresh=true')
+            .then(response => response.json())
+            .then(data => {
+              // Update stats
+              document.getElementById('totalModels').textContent = data.modelStats.totalModels;
+              document.getElementById('newModels').textContent = data.modelStats.modelsCreatedLast30Days;
+              document.getElementById('totalParameters').textContent = (data.modelStats.totalParameters / 1e9).toFixed(1) + 'B';
+              document.getElementById('updatedModels').textContent = data.modelStats.modelsUpdatedLast7Days;
+              
+              document.getElementById('totalUsers').textContent = data.userStats.totalUsers;
+              document.getElementById('adminUsers').textContent = data.userStats.usersByRole.admin || 0;
+              document.getElementById('activeUsers').textContent = data.userStats.activeUsers;
+              document.getElementById('newUsers').textContent = data.userStats.newUsersLast30Days;
+              
+              document.getElementById('cpuUsage').style.width = data.systemStats.cpuUsage + '%';
+              document.getElementById('cpuUsage').textContent = data.systemStats.cpuUsage + '%';
+              
+              const memoryPercentage = Math.round((data.systemStats.memoryUsage.used / data.systemStats.memoryUsage.total) * 100);
+              document.getElementById('memoryUsage').style.width = memoryPercentage + '%';
+              document.getElementById('memoryUsage').textContent = memoryPercentage + '%';
+              
+              document.getElementById('uptime').textContent = Math.floor(data.systemStats.uptime / 3600) + 'h';
+              document.getElementById('dbSize').textContent = Math.round(data.systemStats.databaseSize / (1024 * 1024)) + ' MB';
+              document.getElementById('lastBackup').textContent = data.systemStats.lastBackupTime ? new Date(data.systemStats.lastBackupTime).toLocaleString() : 'Never';
+              
+              // Update charts
+              modelsByProviderChart.data.labels = Object.keys(data.modelStats.modelsByProvider);
+              modelsByProviderChart.data.datasets[0].data = Object.values(data.modelStats.modelsByProvider);
+              modelsByProviderChart.update();
+              
+              usersByRoleChart.data.labels = Object.keys(data.userStats.usersByRole);
+              usersByRoleChart.data.datasets[0].data = Object.values(data.userStats.usersByRole);
+              usersByRoleChart.update();
+              
+              // Update recent models table
+              const recentModelsTable = document.getElementById('recentModelsTable');
+              recentModelsTable.innerHTML = data.recentModels.map(model => `
+                <tr>
+                  <td>${model.name}</td>
+                  <td>${model.provider}</td>
+                  <td>${(model.parameters / 1e9).toFixed(1)}B</td>
+                  <td>${model.createdAt ? new Date(model.createdAt).toLocaleString() : 'N/A'}</td>
+                </tr>
+              `).join('');
+              
+              // Update recent users table
+              const recentUsersTable = document.getElementById('recentUsersTable');
+              recentUsersTable.innerHTML = data.recentUsers.map(user => `
+                <tr>
+                  <td>${user.username}</td>
+                  <td><span class="badge bg-${user.role === 'admin' ? 'danger' : 'primary'}">${user.role}</span></td>
+                  <td>${user.createdAt ? new Date(user.createdAt).toLocaleString() : 'N/A'}</td>
+                </tr>
+              `).join('');
+              
+              // Show success message
+              alert('Dashboard data refreshed successfully!');
+            })
+            .catch(error => {
+              console.error('Error refreshing dashboard data:', error);
+              alert('Failed to refresh dashboard data. See console for details.');
+            });
+        });
+      });
+    </script>
+  `
+}) %>

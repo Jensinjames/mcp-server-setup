@@ -1,0 +1,178 @@
+<%- include('layout', { 
+  user,
+  body: `
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+          <h1 class="mb-0">
+            <i class="fas fa-cube me-2"></i>Models
+          </h1>
+          <div>
+            <a href="/dashboard" class="btn btn-secondary me-2">
+              <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+            </a>
+            <% if (user.role === 'admin') { %>
+              <a href="/models/add" class="btn btn-success">
+                <i class="fas fa-plus me-2"></i>Add Model
+              </a>
+            <% } %>
+          </div>
+        </div>
+        <hr>
+      </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="row mb-4">
+      <div class="col-md-8">
+        <div class="input-group">
+          <span class="input-group-text">
+            <i class="fas fa-search"></i>
+          </span>
+          <input type="text" id="modelSearch" class="form-control" placeholder="Search models...">
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="input-group">
+          <span class="input-group-text">
+            <i class="fas fa-filter"></i>
+          </span>
+          <select id="providerFilter" class="form-select">
+            <option value="">All Providers</option>
+            ${[...new Set(models.map(model => model.provider))].map(provider => 
+              `<option value="${provider}">${provider}</option>`
+            ).join('')}
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Models Table -->
+    <div class="card shadow">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">
+          <i class="fas fa-list me-2"></i>Models List
+        </h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0" id="modelsTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Provider</th>
+                <th>Parameters</th>
+                <th>Created</th>
+                <th>Updated</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${models.map(model => `
+                <tr data-provider="${model.provider}">
+                  <td>${model.id}</td>
+                  <td>${model.name}</td>
+                  <td>${model.provider}</td>
+                  <td>${(model.parameters / 1e9).toFixed(1)}B</td>
+                  <td>${model.createdAt ? new Date(model.createdAt).toLocaleString() : 'N/A'}</td>
+                  <td>${model.updatedAt ? new Date(model.updatedAt).toLocaleString() : 'N/A'}</td>
+                  <td>
+                    <a href="/models/${model.id}" class="btn btn-sm btn-info me-1" title="View">
+                      <i class="fas fa-eye"></i>
+                    </a>
+                    <% if (user.role === 'admin') { %>
+                      <a href="/models/${model.id}/edit" class="btn btn-sm btn-warning me-1" title="Edit">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <a href="/models/${model.id}/delete" class="btn btn-sm btn-danger" title="Delete">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                    <% } %>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="d-flex justify-content-between align-items-center">
+          <span>Total Models: <span id="modelCount">${models.length}</span></span>
+          <button id="exportModels" class="btn btn-sm btn-secondary">
+            <i class="fas fa-download me-2"></i>Export to CSV
+          </button>
+        </div>
+      </div>
+    </div>
+  `,
+  extraScripts: `
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const modelSearch = document.getElementById('modelSearch');
+        const providerFilter = document.getElementById('providerFilter');
+        const modelsTable = document.getElementById('modelsTable');
+        const modelCount = document.getElementById('modelCount');
+        const exportModels = document.getElementById('exportModels');
+        
+        // Search and filter functionality
+        function filterModels() {
+          const searchTerm = modelSearch.value.toLowerCase();
+          const providerValue = providerFilter.value;
+          let visibleCount = 0;
+          
+          Array.from(modelsTable.querySelectorAll('tbody tr')).forEach(row => {
+            const modelName = row.cells[1].textContent.toLowerCase();
+            const modelProvider = row.getAttribute('data-provider');
+            const matchesSearch = modelName.includes(searchTerm);
+            const matchesProvider = providerValue === '' || modelProvider === providerValue;
+            
+            if (matchesSearch && matchesProvider) {
+              row.style.display = '';
+              visibleCount++;
+            } else {
+              row.style.display = 'none';
+            }
+          });
+          
+          modelCount.textContent = visibleCount;
+        }
+        
+        modelSearch.addEventListener('input', filterModels);
+        providerFilter.addEventListener('change', filterModels);
+        
+        // Export to CSV functionality
+        exportModels.addEventListener('click', function() {
+          // Get visible rows
+          const visibleRows = Array.from(modelsTable.querySelectorAll('tbody tr'))
+            .filter(row => row.style.display !== 'none');
+          
+          // Create CSV content
+          let csvContent = 'ID,Name,Provider,Parameters,Created,Updated\\n';
+          
+          visibleRows.forEach(row => {
+            const id = row.cells[0].textContent;
+            const name = row.cells[1].textContent;
+            const provider = row.cells[2].textContent;
+            const parameters = row.cells[3].textContent;
+            const created = row.cells[4].textContent;
+            const updated = row.cells[5].textContent;
+            
+            csvContent += \`"\${id}","\${name}","\${provider}","\${parameters}","\${created}","\${updated}"\\n\`;
+          });
+          
+          // Create download link
+          const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.setAttribute('href', url);
+          link.setAttribute('download', 'models.csv');
+          link.style.visibility = 'hidden';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        });
+      });
+    </script>
+  `
+}) %>
